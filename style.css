@@ -112,3 +112,30 @@ body {
 #start-btn:hover {
     background-color: #3B5549;
 }
+/* 加分數字的樣式 */
+.floating-text {
+    position: absolute;
+    font-size: 24px;
+    font-weight: bold;
+    color: #10B981; /* 漂亮的綠色 */
+    text-shadow: 1px 1px 0px white, -1px -1px 0px white; /* 加上白邊讓字更清楚 */
+    pointer-events: none; /* 確保這個字不會擋到滑鼠點擊 */
+    animation: floatUpAndFade 0.8s ease-out forwards; /* 執行 0.8 秒的動畫 */
+}
+
+/* 扣分數字的樣式（如果以後想用） */
+.floating-text.minus {
+    color: #EF4444; /* 紅色 */
+}
+
+/* 定義飄浮與淡出動畫 */
+@keyframes floatUpAndFade {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-50px); /* 向上飄移 50 像素 */
+        opacity: 0; /* 完全透明 */
+    }
+}
