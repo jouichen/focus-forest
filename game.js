@@ -8,10 +8,10 @@ let toddlerSubTheme = 'FOREST'; // 預設幼兒副主題
 const MODES = {
     TODDLER: { 
         speed: 1800, duration: 30000, penalty: 0, size: '95px', switchProb: 0,
-        themes: {
-            FOREST: { text: "🐿️ 幫小松鼠：抓 🌰", pool: [{e:'🌰', t:true}, {e:'🍂', t:false}] },
-            CAR:    { text: "🚑 幫小車車：抓 ⛽", pool: [{e:'⛽', t:true}, {e:'🛑', t:false}] }, // 抓汽油，避開紅燈/路障
-            CASTLE: { text: "👸 幫小公主：抓 💎", pool: [{e:'💎', t:true}, {e:'🐸', t:false}] }  // 抓鑽石，避開青蛙
+  themes: {
+            FOREST: { text: "🐿️ 專注森林：幫小松鼠抓 🌰", pool: [{e:'🌰', t:true}, {e:'🍂', t:false}] },
+            CAR:    { text: "🚑 森林救援隊：幫小車車加油 ⛽", pool: [{e:'⛽', t:true}, {e:'🛑', t:false}] }, 
+            CASTLE: { text: "👸 森林城堡：幫精靈公主找 💎", pool: [{e:'💎', t:true}, {e:'🐸', t:false}] }
         }
     },
     CHILD: { speed: 1100, duration: 40000, penalty: 5, size: '60px', switchProb: 0.2 }, 
