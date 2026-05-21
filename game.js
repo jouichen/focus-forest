@@ -42,6 +42,7 @@ function showMenu() {
     document.getElementById('sub-menu-overlay').style.display = 'none'; 
     document.getElementById('restart-btn').style.display = 'none';
     document.getElementById('timer-container').style.display = 'none';
+    document.getElementById('game-object').style.display = 'none';
     isPlaying = false;
     clearInterval(gameInterval); clearInterval(timerInterval);
 }
