@@ -1,7 +1,7 @@
-/* 使用柔和的背景色，避免視覺疲勞 */
+/* 使用柔和的淺灰色底，保護眼睛 */
 body {
-    background-color: #F0F4F8;
-    font-family: 'PingFang TC', sans-serif;
+    background-color: #F4F7F5;
+    font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,48 +12,56 @@ body {
 #game-container {
     text-align: center;
     background: white;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    padding: 25px;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(70, 90, 80, 0.08);
+    width: 420px;
 }
 
 #score-board {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: bold;
-    color: #334E68;
-    margin-bottom: 10px;
+    color: #2D4A3E;
+    margin-bottom: 12px;
 }
 
+/* 提示看板 */
 #instruction {
-    font-size: 18px;
-    color: #627D98;
-    margin-bottom: 20px;
-}
-
-.target-text {
-    color: #243E56;
+    font-size: 20px;
+    color: #4A6B5D;
+    background-color: #EBF2EE;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 15px;
     font-weight: bold;
-    background: #E3F9E5;
-    padding: 2px 8px;
-    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
-/* 遊戲舞台，限制目標出現的範圍 */
+/* 遊戲舞台：預設為柔和森林綠，會隨角色切換顏色 */
 #stage {
     width: 400px;
     height: 400px;
-    background-color: #F8FAFC;
-    border: 2px dashed #CBD5E1;
-    border-radius: 15px;
+    background-color: #E2EDE4; /* 森林綠 */
+    border: 3px solid #CBDCD0;
+    border-radius: 20px;
     position: relative;
     overflow: hidden;
     margin-bottom: 20px;
+    transition: background-color 0.5s ease, border-color 0.5s ease;
 }
 
-/* 遊戲目標 */
-/* 遊戲物品的樣式 */
+/* 泥土棕風格（兔兔關卡用） */
+#stage.brown-theme {
+    background-color: #EFE9E4; /* 泥土棕 */
+    border-color: #DFD3C8;
+}
+
+/* 點擊目標（大 Emoji） */
 #game-object {
-    font-size: 50px; /* 讓橡實和動物變大，方便小孩子點擊 */
+    font-size: 55px; /* 放大尺寸更方便兒童點擊 */
     line-height: 1;
     position: absolute;
     cursor: pointer;
@@ -63,18 +71,25 @@ body {
     transition: transform 0.1s ease;
 }
 
-/* 點擊時的縮小特效，給予即時觸覺/視覺回饋 */
+/* 點擊時的放大/縮小回饋 */
 #game-object:active {
     transform: scale(0.8);
 }
 
-
+/* 按鈕樣式 */
 #start-btn {
-    background-color: #10B981;
+    background-color: #4A6B5D;
     color: white;
     border: none;
-    padding: 12px 30px;
-    font-size: 18px;
-    border-radius: 10px;
+    padding: 14px 40px;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 50px;
     cursor: pointer;
+    box-shadow: 0 4px 10px rgba(74, 107, 93, 0.2);
+    transition: background 0.2s;
+}
+
+#start-btn:hover {
+    background-color: #3B5549;
 }
