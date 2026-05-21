@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>專注森林 - 全齡版本</title>
+    <title>專注森林 - 全齡滿配版</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,17 +18,15 @@
         <div id="stage">
             <div id="menu-overlay">
                 <h3>請選擇遊戲模式</h3>
-                <button class="mode-btn" onclick="selectMode('TODDLER')">👶 幼兒模式 (簡單)</button>
-                <button class="mode-btn" onclick="selectMode('CHILD')">🐿️ 兒童模式 (挑戰)</button>
-                <button class="mode-btn" onclick="selectMode('SENIOR')">👵 長輩模式 (樂齡)</button>
+                <button class="mode-btn btn-toddler" onclick="selectMode('TODDLER')">👶 幼兒模式 (簡單)</button>
+                <button class="mode-btn btn-child" onclick="selectMode('CHILD')">🐿️ 兒童模式 (挑戰)</button>
+                <button class="mode-btn btn-senior" onclick="selectMode('SENIOR')">👵 長輩模式 (樂齡)</button>
             </div>
             
-            <div id="toddler-sub-menu" style="display:none;">
-                <h3>你想和誰玩呢？</h3>
-                <button class="mode-btn theme-forest" onclick="initToddlerGame('FOREST')">🌲 森林小動物</button>
-                <button class="mode-btn theme-car" onclick="initToddlerGame('CAR')">🚑 嗶嗶啵啵車車</button>
-                <button class="mode-btn theme-castle" onclick="initToddlerGame('CASTLE')">🏰 夢幻公主城堡</button>
-                <button class="back-btn" onclick="showMenu()">⬅ 重新選擇</button>
+            <div id="sub-menu-overlay" style="display:none;">
+                <h3 id="sub-menu-title">請選擇遊戲主題</h3>
+                <div id="theme-buttons-container"></div>
+                <button class="back-btn" onclick="showMenu()">⬅ 重新選擇身份</button>
             </div>
             
             <div id="game-object"></div>
