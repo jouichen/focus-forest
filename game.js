@@ -5,13 +5,23 @@ let currentModeType = 'CHILD';
 let toddlerSubTheme = 'FOREST'; // 預設幼兒副主題
 
 // 1. 全靈活設定檔：以後要加新主題，直接改這裡就行！
-const MODES = {
+const MODES = { 
     TODDLER: { 
         speed: 1800, duration: 30000, penalty: 0, size: '95px', switchProb: 0,
-  themes: {
+        themes: {
             FOREST: { text: "🐿️ 專注森林：幫小松鼠抓 🌰", pool: [{e:'🌰', t:true}, {e:'🍂', t:false}] },
             CAR:    { text: "🚑 森林救援隊：幫小車車加油 ⛽", pool: [{e:'⛽', t:true}, {e:'🛑', t:false}] }, 
-            CASTLE: { text: "👸 森林城堡：幫精靈公主找 💎", pool: [{e:'💎', t:true}, {e:'🐸', t:false}] }
+            // ----- 已更新：精靈公主城堡主題 -----
+            CASTLE: { 
+                text: "👸 森林城堡：收集公主喜愛的 👑 和 🎀！", 
+                pool: [
+                    {e:'👑', t:true},  // 得分目標 1：閃亮皇冠
+                    {e:'🎀', t:true},  // 得分目標 2：可愛蝴蝶結
+                    {e:'🏰', t:false}, // 干擾項 1：這是大城堡（不能抓）
+                    {e:'🧌', t:false}  // 干擾項 2：綠色泥巴怪（髒兮兮不能點）
+                ] 
+            }
+            // ----------------------------------
         }
     },
     CHILD: { speed: 1100, duration: 40000, penalty: 5, size: '60px', switchProb: 0.2 }, 
@@ -79,69 +89,3 @@ function startGame() {
         timeLeft -= 100;
         document.getElementById('timer-bar').style.width = (timeLeft / currentConfig.duration * 100) + '%';
         if (timeLeft <= 0) endGame();
-    }, 100);
-}
-
-// 6. 每回合的角色與提示切換
-function updateModeLogic() {
-    const inst = document.getElementById('instruction');
-    
-    if (currentModeType === 'TODDLER') {
-        // 幼兒模式：讀取對應的副主題設定
-        const themeData = currentConfig.themes[toddlerSubTheme];
-        inst.innerHTML = themeData.text;
-        activePool = themeData.pool;
-    } else {
-        // 兒童與長輩模式：隨機切換松鼠或兔兔
-        const isSquirrel = Math.random() > 0.5;
-        const char = isSquirrel ? "🐿️ 松鼠" : "🐇 兔兔";
-        const target = isSquirrel ? "🌰 橡實" : "🥕 蘿蔔";
-        inst.innerHTML = `${char}說：幫我抓 ${target}`;
-        activePool = isSquirrel ? [{e:'🌰', t:true}, {e:'🍄', t:false}] : [{e:'🥕', t:true}, {e:'🪨', t:false}];
-    }
-}
-
-function nextTurn() {
-    const item = activePool[Math.floor(Math.random() * activePool.length)];
-    const obj = document.getElementById('game-object');
-    obj.innerText = item.e;
-    obj.dataset.isTarget = item.t;
-    // 隨機在 400x400 的舞台內調整位置 (扣除物件本身大小)
-    obj.style.left = Math.random() * (400 - 100) + 'px';
-    obj.style.top = Math.random() * (400 - 100) + 'px';
-    obj.style.display = 'block';
-}
-
-// 7. 點擊判定
-document.getElementById('game-object').addEventListener('pointerdown', function(e) {
-    if (!isPlaying) return;
-    const isTarget = this.dataset.isTarget === 'true';
-    const floatDiv = document.createElement('div');
-    floatDiv.className = 'floating-text ' + (isTarget ? 'plus' : 'minus');
-    
-    if (isTarget) {
-        score += 10;
-        floatDiv.innerText = currentModeType === 'TODDLER' ? '⭐' : '+10';
-        correctSound.currentTime = 0; correctSound.play().catch(e=>{});
-    } else {
-        score = Math.max(0, score - currentConfig.penalty);
-        // 幼兒點錯不扣分，只飄出干擾物圖標
-        floatDiv.innerText = currentModeType === 'TODDLER' ? '💨' : `-${currentConfig.penalty}`;
-        wrongSound.currentTime = 0; wrongSound.play().catch(e=>{});
-    }
-
-    floatDiv.style.left = e.offsetX + 'px';
-    floatDiv.style.top = e.offsetY + 'px';
-    document.getElementById('stage').appendChild(floatDiv);
-    setTimeout(()=>floatDiv.remove(), 800);
-    document.getElementById('score').innerText = score;
-    this.style.display = 'none';
-});
-
-function endGame() {
-    clearInterval(gameInterval); clearInterval(timerInterval);
-    isPlaying = false;
-    document.getElementById('game-object').style.display = 'none';
-    document.getElementById('restart-btn').style.display = 'inline-block';
-    alert(`遊戲結束！您的得分是：${score}`);
-}
