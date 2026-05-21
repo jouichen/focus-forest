@@ -1,10 +1,9 @@
 let score = 0;
 let gameInterval;
-let timerInterval; // 新增：控制計時器的變數
+let timerInterval;
 let isPlaying = false;
 let currentMode = 'squirrel';
 
-// 遊戲總時間設定（30秒 = 30000毫秒）
 const GAME_DURATION = 30000; 
 let timeLeft = GAME_DURATION;
 
@@ -15,6 +14,21 @@ const stage = document.getElementById('stage');
 const instruction = document.getElementById('instruction');
 const timerContainer = document.getElementById('timer-container');
 const timerBar = document.getElementById('timer-bar');
+
+// --- 新增：線上免版權音效與音樂網址 ---
+// 答對音效：清脆叮咚聲
+const correctSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-84.wav');
+// 答錯音效：溫和水滴聲
+const wrongSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav');
+// 背景音樂：大自然森林蟲鳴鳥叫 (設定自動循環播放)
+const bgm = new Audio('https://assets.mixkit.co/active_storage/sfx/1238/1238-84.wav'); 
+bgm.loop = true; 
+bgm.volume = 0.4; // 調整背景音樂音量，不要太大聲
+
+// 稍微降低音效音量，保護小朋友耳朵
+correctSound.volume = 0.6;
+wrongSound.volume = 0.5;
+// ------------------------------------
 
 const squirrelPool = [
     { emoji: '🌰', isTarget: true },
@@ -35,18 +49,21 @@ function startGame() {
     if (isPlaying) return;
     isPlaying = true;
     score = 0;
-    timeLeft = GAME_DURATION; // 重設時間
+    timeLeft = GAME_DURATION;
     scoreDisplay.innerText = score;
     startBtn.style.display = 'none';
     
-    // 顯示計時條，並讓進度條全滿
     timerContainer.style.display = 'block';
     timerBar.style.width = '100%';
+    
+    // --- 新增：開始遊戲時播放背景音樂 ---
+    bgm.currentTime = 0; // 從頭播放
+    bgm.play().catch(e => console.log("音樂播放被瀏覽器阻擋，需等待使用者點擊。"));
+    // ----------------------------------
     
     switchMode();
     nextTurn();
     
-    // 每 1.2 秒更換物品
     gameInterval = setInterval(() => {
         if (Math.random() < 0.2) {
             switchMode();
@@ -54,13 +71,11 @@ function startGame() {
         nextTurn();
     }, 1200);
     
-    // 新增：每 100 毫秒（0.1秒）更新一次計時器長度
     timerInterval = setInterval(() => {
         timeLeft -= 100;
         const percentage = (timeLeft / GAME_DURATION) * 100;
         timerBar.style.width = percentage + '%';
         
-        // 當時間到了就結束遊戲
         if (timeLeft <= 0) {
             endGame();
         }
@@ -83,7 +98,7 @@ function nextTurn() {
     const currentItem = currentPool[Math.floor(Math.random() * currentPool.length)];
     
     gameObject.innerText = currentItem.emoji;
-    gameObject.dataset.isTarget = currentTarget = currentItem.isTarget;
+    gameObject.dataset.isTarget = currentItem.isTarget;
 
     const maxX = stage.clientWidth - 70;
     const maxY = stage.clientHeight - 70;
@@ -101,57 +116,59 @@ function handleClick(e) {
 
     const isTarget = gameObject.dataset.isTarget === 'true';
     
-    // --- 新增：獲取點擊位置並創造飄浮文字 ---
-    // 取得點擊時相對於遊戲舞台（stage）的座標
     const rect = stage.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
 
-    // 建立一個新的 div 來放數字
     const floatDiv = document.createElement('div');
     floatDiv.classList.add('floating-text');
     
-    // 根據對錯給予不同的分數與顏色
     if (isTarget) {
         score += 10;
         floatDiv.innerText = '+10';
+        
+        // --- 新增：播放答對音效 ---
+        correctSound.currentTime = 0; // 重設時間，連續狂點時音效才不會卡住
+        correctSound.play();
+        // -------------------------
     } else {
         score = Math.max(0, score - 5);
         floatDiv.innerText = '-5';
-        floatDiv.classList.add('minus'); // 變成紅色字
+        floatDiv.classList.add('minus');
+        
+        // --- 新增：播放答錯音效 ---
+        wrongSound.currentTime = 0;
+        wrongSound.play();
+        // -------------------------
     }
     
-    // 設定特效字出現的位置（剛好在點擊點的上方一點點）
     floatDiv.style.left = (clickX - 15) + 'px';
     floatDiv.style.top = (clickY - 20) + 'px';
-    
-    // 把特效放進遊戲舞台裡
     stage.appendChild(floatDiv);
     
-    // 動態結束後（0.8秒），自動把這個 div 刪除，不佔記憶體
-    setTimeout(() => {
-        floatDiv.remove();
-    }, 800);
-    // ----------------------------------------
+    setTimeout(() => { floatDiv.remove(); }, 800);
 
     scoreDisplay.innerText = score;
-    gameObject.style.display = 'none'; // 目標立刻消失
+    gameObject.style.display = 'none';
 }
 
 function endGame() {
     clearInterval(gameInterval);
-    clearInterval(timerInterval); // 新增：停止計時器
+    clearInterval(timerInterval);
+    
+    // --- 新增：遊戲結束時停止背景音樂 ---
+    bgm.pause();
+    // ----------------------------------
     
     isPlaying = false;
     gameObject.style.display = 'none';
-    timerContainer.style.display = 'none'; // 隱藏計時器
+    timerContainer.style.display = 'none';
     stage.classList.remove('brown-theme');
     
     instruction.innerHTML = `🌲 歡迎來到專注森林 🌲`;
     startBtn.style.display = 'inline-block';
     startBtn.innerText = '再幫一次小動物';
     
-    // 延遲一點點跳出提示，讓孩子先看清最後畫面
     setTimeout(() => {
         alert(`時間到囉！\n小動物們很開心有你的幫忙，你得到了 ${score} 分！🌟`);
     }, 100);
