@@ -2,33 +2,31 @@ let score = 0;
 let gameInterval, timerInterval, isPlaying = false;
 let currentConfig = {};
 let currentModeType = 'CHILD';
-let toddlerSubTheme = 'FOREST'; // 預設幼兒副主題
+let toddlerSubTheme = 'FOREST'; 
 
-// 1. 全靈活設定檔：以後要加新主題，直接改這裡就行！
+// 1. 各模式主設定檔
 const MODES = { 
     TODDLER: { 
         speed: 1800, duration: 30000, penalty: 0, size: '95px', switchProb: 0,
         themes: {
             FOREST: { text: "🐿️ 專注森林：幫小松鼠抓 🌰", pool: [{e:'🌰', t:true}, {e:'🍂', t:false}] },
             CAR:    { text: "🚑 森林救援隊：幫小車車加油 ⛽", pool: [{e:'⛽', t:true}, {e:'🛑', t:false}] }, 
-            // ----- 已更新：精靈公主城堡主題 -----
             CASTLE: { 
                 text: "👸 森林城堡：收集公主喜愛的 👑 和 🎀！", 
                 pool: [
-                    {e:'👑', t:true},  // 得分目標 1：閃亮皇冠
-                    {e:'🎀', t:true},  // 得分目標 2：可愛蝴蝶結
-                    {e:'🏰', t:false}, // 干擾項 1：這是大城堡（不能抓）
-                    {e:'🧌', t:false}  // 干擾項 2：綠色泥巴怪（髒兮兮不能點）
+                    {e:'👑', t:true},  
+                    {e:'🎀', t:true},  
+                    {e:'🏰', t:false}, 
+                    {e:'🧌', t:false}  
                 ] 
             }
-            // ----------------------------------
         }
     },
     CHILD: { speed: 1100, duration: 40000, penalty: 5, size: '60px', switchProb: 0.2 }, 
     SENIOR: { speed: 2500, duration: 60000, penalty: 0, size: '85px', switchProb: 0.1 } 
 };
 
-// 音效 (請確保已上傳至你的 GitHub 專案中)
+// 音效設定
 const correctSound = new Audio('success.mp3');
 const wrongSound = new Audio('pop.mp3');
 
@@ -37,7 +35,7 @@ let activePool = [];
 // 2. 顯示主選單
 function showMenu() {
     document.getElementById('menu-overlay').style.display = 'flex';
-    document.getElementById('toddler-sub-menu').style.display = 'none'; // 隱藏幼兒子選單
+    document.getElementById('toddler-sub-menu').style.display = 'none'; 
     document.getElementById('restart-btn').style.display = 'none';
     document.getElementById('timer-container').style.display = 'none';
     isPlaying = false;
@@ -51,11 +49,9 @@ function selectMode(mode) {
     currentConfig = MODES[mode];
     
     if (mode === 'TODDLER') {
-        // 如果是幼兒，不直接開始，先切換到「選車車、小動物或公主」的子選單
         document.getElementById('menu-overlay').style.display = 'none';
         document.getElementById('toddler-sub-menu').style.display = 'flex';
     } else {
-        // 其他模式直接開始
         document.getElementById('menu-overlay').style.display = 'none';
         startGame();
     }
@@ -89,3 +85,65 @@ function startGame() {
         timeLeft -= 100;
         document.getElementById('timer-bar').style.width = (timeLeft / currentConfig.duration * 100) + '%';
         if (timeLeft <= 0) endGame();
+    }, 100);
+}
+
+// 6. 每回合的角色與提示切換
+function updateModeLogic() {
+    const inst = document.getElementById('instruction');
+    
+    if (currentModeType === 'TODDLER') {
+        const themeData = currentConfig.themes[toddlerSubTheme];
+        inst.innerHTML = themeData.text;
+        activePool = themeData.pool;
+    } else {
+        const isSquirrel = Math.random() > 0.5;
+        const char = isSquirrel ? "🐿️ 松鼠" : "🐇 兔兔";
+        const target = isSquirrel ? "🌰 橡實" : "🥕 蘿蔔";
+        inst.innerHTML = `${char}說：幫我抓 ${target}`;
+        activePool = isSquirrel ? [{e:'🌰', t:true}, {e:'🍄', t:false}] : [{e:'🥕', t:true}, {e:'🪨', t:false}];
+    }
+}
+
+function nextTurn() {
+    const item = activePool[Math.floor(Math.random() * activePool.length)];
+    const obj = document.getElementById('game-object');
+    obj.innerText = item.e;
+    obj.dataset.isTarget = item.t;
+    obj.style.left = Math.random() * (400 - 100) + 'px';
+    obj.style.top = Math.random() * (400 - 100) + 'px';
+    obj.style.display = 'block';
+}
+
+// 7. 點擊判定
+document.getElementById('game-object').addEventListener('pointerdown', function(e) {
+    if (!isPlaying) return;
+    const isTarget = this.dataset.isTarget === 'true';
+    const floatDiv = document.createElement('div');
+    floatDiv.className = 'floating-text ' + (isTarget ? 'plus' : 'minus');
+    
+    if (isTarget) {
+        score += 10;
+        floatDiv.innerText = currentModeType === 'TODDLER' ? '⭐' : '+10';
+        correctSound.currentTime = 0; correctSound.play().catch(e=>{});
+    } else {
+        score = Math.max(0, score - currentConfig.penalty);
+        floatDiv.innerText = currentModeType === 'TODDLER' ? '💨' : `-${currentConfig.penalty}`;
+        wrongSound.currentTime = 0; wrongSound.play().catch(e=>{});
+    }
+
+    floatDiv.style.left = e.offsetX + 'px';
+    floatDiv.style.top = e.offsetY + 'px';
+    document.getElementById('stage').appendChild(floatDiv);
+    setTimeout(()=>floatDiv.remove(), 800);
+    document.getElementById('score').innerText = score;
+    this.style.display = 'none';
+});
+
+function endGame() {
+    clearInterval(gameInterval); clearInterval(timerInterval);
+    isPlaying = false;
+    document.getElementById('game-object').style.display = 'none';
+    document.getElementById('restart-btn').style.display = 'inline-block';
+    alert(`遊戲結束！您的得分是：${score}`);
+}
