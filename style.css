@@ -1,0 +1,76 @@
+/* 使用柔和的背景色，避免視覺疲勞 */
+body {
+    background-color: #F0F4F8;
+    font-family: 'PingFang TC', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#game-container {
+    text-align: center;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+#score-board {
+    font-size: 24px;
+    font-weight: bold;
+    color: #334E68;
+    margin-bottom: 10px;
+}
+
+#instruction {
+    font-size: 18px;
+    color: #627D98;
+    margin-bottom: 20px;
+}
+
+.target-text {
+    color: #243E56;
+    font-weight: bold;
+    background: #E3F9E5;
+    padding: 2px 8px;
+    border-radius: 5px;
+}
+
+/* 遊戲舞台，限制目標出現的範圍 */
+#stage {
+    width: 400px;
+    height: 400px;
+    background-color: #F8FAFC;
+    border: 2px dashed #CBD5E1;
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+/* 遊戲目標 */
+#game-object {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    position: absolute;
+    cursor: pointer;
+    display: none;
+    transition: transform 0.1s ease;
+}
+
+#game-object:active {
+    transform: scale(0.9);
+}
+
+#start-btn {
+    background-color: #10B981;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 18px;
+    border-radius: 10px;
+    cursor: pointer;
+}
