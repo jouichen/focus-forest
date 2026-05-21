@@ -1,178 +1,110 @@
 let score = 0;
-let gameInterval;
-let timerInterval;
-let isPlaying = false;
-let currentMode = 'squirrel';
+let gameInterval, timerInterval, isPlaying = false;
+let currentConfig = {};
+let currentModeType = 'CHILD';
 
-const GAME_DURATION = 30000; 
-let timeLeft = GAME_DURATION;
+const MODES = {
+    TODDLER: { speed: 1800, duration: 30000, penalty: 0, size: '95px', switchProb: 0, pool: [{e:'🌰', t:true}, {e:'🍂', t:false}] },
+    CHILD: { speed: 1100, duration: 40000, penalty: 5, size: '60px', switchProb: 0.2, pool: [] }, // 兒童版會動態切換
+    SENIOR: { speed: 2500, duration: 60000, penalty: 0, size: '85px', switchProb: 0.1, pool: [] } 
+};
 
-const gameObject = document.getElementById('game-object');
-const scoreDisplay = document.getElementById('score');
-const startBtn = document.getElementById('start-btn');
-const stage = document.getElementById('stage');
-const instruction = document.getElementById('instruction');
-const timerContainer = document.getElementById('timer-container');
-const timerBar = document.getElementById('timer-bar');
-
-// --- 更新：直接讀取你 GitHub 專案裡的音效檔案 ---
-// 答對音效（讀取同目錄下的 success.mp3）
+// 音效 (請確保已上傳至 GitHub)
 const correctSound = new Audio('success.mp3');
-
-// 答錯音效（讀取同目錄下的 pop.mp3）
 const wrongSound = new Audio('pop.mp3');
 
-// 背景音樂（我們先暫時關閉，確保前兩個音效正常發聲）
-const bgm = new Audio(''); 
-// ------------------------------------
+function showMenu() {
+    document.getElementById('menu-overlay').style.display = 'flex';
+    document.getElementById('restart-btn').style.display = 'none';
+    document.getElementById('timer-container').style.display = 'none';
+    isPlaying = false;
+    clearInterval(gameInterval);
+    clearInterval(timerInterval);
+}
 
-bgm.loop = true; 
-bgm.volume = 0.3; // 背景音樂小聲、舒服即可
-
-correctSound.volume = 0.5;
-wrongSound.volume = 0.4;
-// ------------------------------------
-
-const squirrelPool = [
-    { emoji: '🌰', isTarget: true },
-    { emoji: '🍄', isTarget: false }, 
-    { emoji: '🍂', isTarget: false }
-];
-
-const rabbitPool = [
-    { emoji: '🥕', isTarget: true },
-    { emoji: '🦋', isTarget: false },
-    { emoji: '🪨', isTarget: false }
-];
-
-startBtn.addEventListener('click', startGame);
-gameObject.addEventListener('pointerdown', handleClick);
+function initGame(mode) {
+    currentModeType = mode;
+    currentConfig = MODES[mode];
+    document.getElementById('menu-overlay').style.display = 'none';
+    startGame();
+}
 
 function startGame() {
-    if (isPlaying) return;
     isPlaying = true;
     score = 0;
-    timeLeft = GAME_DURATION;
-    scoreDisplay.innerText = score;
-    startBtn.style.display = 'none';
+    let timeLeft = currentConfig.duration;
+    document.getElementById('score').innerText = score;
+    document.getElementById('timer-container').style.display = 'block';
+    document.getElementById('game-object').style.fontSize = currentConfig.size;
     
-    timerContainer.style.display = 'block';
-    timerBar.style.width = '100%';
-    
-    // --- 新增：開始遊戲時播放背景音樂 ---
-    bgm.currentTime = 0; // 從頭播放
-    bgm.play().catch(e => console.log("音樂播放被瀏覽器阻擋，需等待使用者點擊。"));
-    // ----------------------------------
-    
-    switchMode();
+    updateModeLogic(); // 初始化角色提示
     nextTurn();
-    
+
     gameInterval = setInterval(() => {
-        if (Math.random() < 0.2) {
-            switchMode();
-        }
+        if (Math.random() < currentConfig.switchProb) updateModeLogic();
         nextTurn();
-    }, 1200);
-    
+    }, currentConfig.speed);
+
     timerInterval = setInterval(() => {
         timeLeft -= 100;
-        const percentage = (timeLeft / GAME_DURATION) * 100;
-        timerBar.style.width = percentage + '%';
-        
-        if (timeLeft <= 0) {
-            endGame();
-        }
+        document.getElementById('timer-bar').style.width = (timeLeft / currentConfig.duration * 100) + '%';
+        if (timeLeft <= 0) endGame();
     }, 100);
 }
 
-function switchMode() {
-    currentMode = Math.random() > 0.5 ? 'squirrel' : 'rabbit';
-    if (currentMode === 'squirrel') {
-        stage.classList.remove('brown-theme');
-        instruction.innerHTML = `🐿️ 松鼠說：幫我收集 <span>🌰 橡實</span>！`;
+let activePool = [];
+function updateModeLogic() {
+    const isSquirrel = Math.random() > 0.5;
+    const inst = document.getElementById('instruction');
+    if (currentModeType === 'TODDLER') {
+        inst.innerHTML = "🐿️ 幫幫小松鼠：抓 🌰";
+        activePool = [{e:'🌰', t:true}, {e:'🍂', t:false}];
     } else {
-        stage.classList.add('brown-theme');
-        instruction.innerHTML = `🐇 兔兔說：幫我收集 <span>🥕 蘿蔔</span>！`;
+        const char = isSquirrel ? "🐿️ 松鼠" : "🐇 兔兔";
+        const target = isSquirrel ? "🌰 橡實" : "🥕 蘿蔔";
+        inst.innerHTML = `${char}說：幫我抓 ${target}`;
+        activePool = isSquirrel ? [{e:'🌰', t:true}, {e:'🍄', t:false}] : [{e:'🥕', t:true}, {e:'🪨', t:false}];
     }
 }
 
 function nextTurn() {
-    const currentPool = currentMode === 'squirrel' ? squirrelPool : rabbitPool;
-    const currentItem = currentPool[Math.floor(Math.random() * currentPool.length)];
-    
-    gameObject.innerText = currentItem.emoji;
-    gameObject.dataset.isTarget = currentItem.isTarget;
-
-    const maxX = stage.clientWidth - 70;
-    const maxY = stage.clientHeight - 70;
-    const randomX = Math.floor(Math.random() * maxX);
-    const randomY = Math.floor(Math.random() * maxY);
-
-    gameObject.style.left = randomX + 'px';
-    gameObject.style.top = randomY + 'px';
-    gameObject.style.display = 'block';
+    const item = activePool[Math.floor(Math.random() * activePool.length)];
+    const obj = document.getElementById('game-object');
+    obj.innerText = item.e;
+    obj.dataset.isTarget = item.t;
+    obj.style.left = Math.random() * (400 - 100) + 'px';
+    obj.style.top = Math.random() * (400 - 100) + 'px';
+    obj.style.display = 'block';
 }
 
-function handleClick(e) {
+document.getElementById('game-object').addEventListener('pointerdown', function(e) {
     if (!isPlaying) return;
-    e.preventDefault();
-
-    const isTarget = gameObject.dataset.isTarget === 'true';
-    
-    const rect = stage.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
-
+    const isTarget = this.dataset.isTarget === 'true';
     const floatDiv = document.createElement('div');
-    floatDiv.classList.add('floating-text');
+    floatDiv.className = 'floating-text ' + (isTarget ? 'plus' : 'minus');
     
     if (isTarget) {
         score += 10;
-        floatDiv.innerText = '+10';
-        
-        // --- 新增：播放答對音效 ---
-        correctSound.currentTime = 0; // 重設時間，連續狂點時音效才不會卡住
-        correctSound.play();
-        // -------------------------
+        floatDiv.innerText = currentModeType === 'TODDLER' ? '⭐' : '+10';
+        correctSound.currentTime = 0; correctSound.play().catch(e=>{});
     } else {
-        score = Math.max(0, score - 5);
-        floatDiv.innerText = '-5';
-        floatDiv.classList.add('minus');
-        
-        // --- 新增：播放答錯音效 ---
-        wrongSound.currentTime = 0;
-        wrongSound.play();
-        // -------------------------
+        score = Math.max(0, score - currentConfig.penalty);
+        floatDiv.innerText = currentModeType === 'TODDLER' ? '🍂' : `-${currentConfig.penalty}`;
+        wrongSound.currentTime = 0; wrongSound.play().catch(e=>{});
     }
-    
-    floatDiv.style.left = (clickX - 15) + 'px';
-    floatDiv.style.top = (clickY - 20) + 'px';
-    stage.appendChild(floatDiv);
-    
-    setTimeout(() => { floatDiv.remove(); }, 800);
 
-    scoreDisplay.innerText = score;
-    gameObject.style.display = 'none';
-}
+    floatDiv.style.left = e.offsetX + 'px';
+    floatDiv.style.top = e.offsetY + 'px';
+    document.getElementById('stage').appendChild(floatDiv);
+    setTimeout(()=>floatDiv.remove(), 800);
+    document.getElementById('score').innerText = score;
+    this.style.display = 'none';
+});
 
 function endGame() {
-    clearInterval(gameInterval);
-    clearInterval(timerInterval);
-    
-    // --- 新增：遊戲結束時停止背景音樂 ---
-    bgm.pause();
-    // ----------------------------------
-    
+    clearInterval(gameInterval); clearInterval(timerInterval);
     isPlaying = false;
-    gameObject.style.display = 'none';
-    timerContainer.style.display = 'none';
-    stage.classList.remove('brown-theme');
-    
-    instruction.innerHTML = `🌲 歡迎來到專注森林 🌲`;
-    startBtn.style.display = 'inline-block';
-    startBtn.innerText = '再幫一次小動物';
-    
-    setTimeout(() => {
-        alert(`時間到囉！\n小動物們很開心有你的幫忙，你得到了 ${score} 分！🌟`);
-    }, 100);
+    document.getElementById('game-object').style.display = 'none';
+    document.getElementById('restart-btn').style.display = 'inline-block';
+    alert(`遊戲結束！您的得分是：${score}`);
 }
