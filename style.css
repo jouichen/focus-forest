@@ -1,141 +1,30 @@
-/* 使用柔和的淺灰色底，保護眼睛 */
-body {
-    background-color: #F4F7F5;
-    font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
+```css
+body { background-color: #F4F7F5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
+#game-container { text-align: center; background: white; padding: 25px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 450px; position: relative;}
+#stage { width: 400px; height: 400px; background-color: #E2EDE4; border-radius: 20px; position: relative; overflow: hidden; margin: 0 auto 20px; border: 3px solid #CBDCD0; }
 
-#game-container {
-    text-align: center;
-    background: white;
-    padding: 25px;
-    border-radius: 24px;
-    box-shadow: 0 10px 30px rgba(70, 90, 80, 0.08);
-    width: 420px;
+/* 選單覆蓋層 */
+#menu-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px);
+    display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10;
 }
+.mode-btn {
+    width: 250px; padding: 15px; margin: 10px; font-size: 18px; font-weight: bold;
+    border: none; border-radius: 50px; cursor: pointer; transition: 0.2s;
+    background: #4A6B5D; color: white;
+}
+.mode-btn:hover { transform: scale(1.05); background: #3B5549; }
 
-/* 計時器外殼（灰色外框） */
-#timer-container {
-    width: 100%;
-    height: 12px;
-    background-color: #E2E8F0;
-    border-radius: 6px;
-    margin-bottom: 15px;
-    overflow: hidden;
-    display: none; /* 平時隱藏，開始遊戲才出現 */
-}
+/* 遊戲物件樣式（根據模式動態調整大小） */
+#game-object { position: absolute; cursor: pointer; display: none; user-select: none; -webkit-user-select: none; transition: transform 0.1s; }
+#game-object:active { transform: scale(0.8); }
 
-/* 計時器亮條（動態變短） */
-#timer-bar {
-    width: 100%;
-    height: 100%;
-    background-color: #10B981; /* 柔和的綠色進度條 */
-    border-radius: 6px;
-    transition: width 0.1s linear; /* 讓縮短的動畫更平滑 */
-}
-#score-board {
-    font-size: 26px;
-    font-weight: bold;
-    color: #2D4A3E;
-    margin-bottom: 12px;
-}
+/* 計時器 */
+#timer-container { width: 100%; height: 10px; background: #eee; border-radius: 5px; margin-bottom: 15px; overflow: hidden; display: none; }
+#timer-bar { width: 100%; height: 100%; background: #10B981; transition: width 0.1s linear; }
 
-/* 提示看板 */
-#instruction {
-    font-size: 20px;
-    color: #4A6B5D;
-    background-color: #EBF2EE;
-    padding: 12px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-/* 遊戲舞台：預設為柔和森林綠，會隨角色切換顏色 */
-#stage {
-    width: 400px;
-    height: 400px;
-    background-color: #E2EDE4; /* 森林綠 */
-    border: 3px solid #CBDCD0;
-    border-radius: 20px;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 20px;
-    transition: background-color 0.5s ease, border-color 0.5s ease;
-}
-
-/* 泥土棕風格（兔兔關卡用） */
-#stage.brown-theme {
-    background-color: #EFE9E4; /* 泥土棕 */
-    border-color: #DFD3C8;
-}
-
-/* 點擊目標（大 Emoji） */
-#game-object {
-    font-size: 55px; /* 放大尺寸更方便兒童點擊 */
-    line-height: 1;
-    position: absolute;
-    cursor: pointer;
-    display: none;
-    user-select: none;
-    -webkit-user-select: none;
-    transition: transform 0.1s ease;
-}
-
-/* 點擊時的放大/縮小回饋 */
-#game-object:active {
-    transform: scale(0.8);
-}
-
-/* 按鈕樣式 */
-#start-btn {
-    background-color: #4A6B5D;
-    color: white;
-    border: none;
-    padding: 14px 40px;
-    font-size: 20px;
-    font-weight: bold;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(74, 107, 93, 0.2);
-    transition: background 0.2s;
-}
-
-#start-btn:hover {
-    background-color: #3B5549;
-}
-/* 加分數字的樣式 */
-.floating-text {
-    position: absolute;
-    font-size: 24px;
-    font-weight: bold;
-    color: #10B981; /* 漂亮的綠色 */
-    text-shadow: 1px 1px 0px white, -1px -1px 0px white; /* 加上白邊讓字更清楚 */
-    pointer-events: none; /* 確保這個字不會擋到滑鼠點擊 */
-    animation: floatUpAndFade 0.8s ease-out forwards; /* 執行 0.8 秒的動畫 */
-}
-
-/* 扣分數字的樣式（如果以後想用） */
-.floating-text.minus {
-    color: #EF4444; /* 紅色 */
-}
-
-/* 定義飄浮與淡出動畫 */
-@keyframes floatUpAndFade {
-    0% {
-        transform: translateY(0);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-50px); /* 向上飄移 50 像素 */
-        opacity: 0; /* 完全透明 */
-    }
-}
+/* 飄浮文字 */
+.floating-text { position: absolute; font-weight: bold; pointer-events: none; animation: floatUp 0.8s forwards; font-size: 24px;}
+@keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-50px); opacity: 0; } }
+.minus { color: #EF4444; } .plus { color: #10B981; }
