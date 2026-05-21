@@ -62,26 +62,31 @@ function showMenu() {
         inst.innerHTML = "🌲 歡迎來到專注森林 🌲";
     }
 }
-}
 
-// 選擇身份後，動態製造該身份的主題按鈕
+// 3. 處理點擊模式按鈕（新增：進入前先斬斷所有前局計時器）
 function selectMode(mode) {
+    // 徹底清除前一局可能殘留的幽靈計時器
+    clearInterval(gameInterval);
+    clearInterval(timerInterval);
+    
     currentModeType = mode;
     currentConfig = MODES[mode];
     
     const container = document.getElementById('theme-buttons-container');
     container.innerHTML = ''; // 清空舊按鈕
     
-    // 設定子選單標題
     const titles = { TODDLER: "👶 幼童專屬主題", CHILD: "🐿️ 兒童挑戰主題", SENIOR: "👵 樂齡懷舊主題" };
-    document.getElementById('sub-menu-title').innerText = titles[mode];
+    document.getElementById('sub-menu-overlay').style.innerText = titles[mode]; // 修正原代碼小手誤：使用 innerText 確保相容
+    if(document.getElementById('sub-menu-title')) {
+        document.getElementById('sub-menu-title').innerText = titles[mode];
+    }
 
-    // 動態生出按鈕
+    // 動態生成按鈕
     Object.keys(currentConfig.themes).forEach(key => {
         const theme = currentConfig.themes[key];
         const btn = document.createElement('button');
         btn.className = 'mode-btn';
-        btn.style.backgroundColor = theme.c; // 使用設定檔的專屬顏色
+        btn.style.backgroundColor = theme.c;
         btn.innerText = theme.n;
         btn.onclick = () => startThemedGame(key);
         container.appendChild(btn);
@@ -97,7 +102,12 @@ function startThemedGame(themeKey) {
     startGame();
 }
 
+// 5. 遊戲主邏輯（雙重保險版）
 function startGame() {
+    // 【最關鍵的一步】啟動新局前，先把舊的計時器全部開槍擊斃！
+    clearInterval(gameInterval);
+    clearInterval(timerInterval);
+
     isPlaying = true;
     score = 0;
     let timeLeft = currentConfig.duration;
@@ -105,9 +115,17 @@ function startGame() {
     document.getElementById('timer-container').style.display = 'block';
     document.getElementById('game-object').style.fontSize = currentConfig.size;
     
+    // 清空並隱藏可能殘留的舊物件
+    const obj = document.getElementById('game-object');
+    if (obj) {
+        obj.style.display = 'none';
+        obj.innerText = ''; 
+    }
+    
     updateModeLogic(); 
     nextTurn();
 
+    // 啟動這一局全新的計時器
     gameInterval = setInterval(() => {
         if (Math.random() < currentConfig.switchProb) updateModeLogic();
         nextTurn();
