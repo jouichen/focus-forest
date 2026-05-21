@@ -51,19 +51,23 @@ body {
 }
 
 /* 遊戲目標 */
+/* 遊戲物品的樣式 */
 #game-object {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
+    font-size: 50px; /* 讓橡實和動物變大，方便小孩子點擊 */
+    line-height: 1;
     position: absolute;
     cursor: pointer;
     display: none;
+    user-select: none;
+    -webkit-user-select: none;
     transition: transform 0.1s ease;
 }
 
+/* 點擊時的縮小特效，給予即時觸覺/視覺回饋 */
 #game-object:active {
-    transform: scale(0.9);
+    transform: scale(0.8);
 }
+
 
 #start-btn {
     background-color: #10B981;
