@@ -38,13 +38,30 @@ const wrongSound = new Audio('pop.mp3');
 let activePool = [];
 
 function showMenu() {
+    // 1. 先開槍擊斃計時器！防止它在背景偷偷重新整理、把物件叫出來
+    clearInterval(gameInterval); 
+    clearInterval(timerInterval);
+    isPlaying = false;
+
+    // 2. 切換選單的顯示狀態
     document.getElementById('menu-overlay').style.display = 'flex';
     document.getElementById('sub-menu-overlay').style.display = 'none'; 
     document.getElementById('restart-btn').style.display = 'none';
     document.getElementById('timer-container').style.display = 'none';
-    document.getElementById('game-object').style.display = 'none';
-    isPlaying = false;
-    clearInterval(gameInterval); clearInterval(timerInterval);
+    
+    // 3. 徹底清空並隱藏遊戲物件（例如大垃圾桶、皇冠）
+    const obj = document.getElementById('game-object');
+    if (obj) {
+        obj.style.display = 'none';
+        obj.innerText = ''; // 關鍵：直接把裡面的 Emoji 擦掉，確保就算穿透也是透明的
+    }
+
+    // 4. 把最上方的提示文字還原成歡迎詞，這樣就不會殘留「準備熬湯」
+    const inst = document.getElementById('instruction');
+    if (inst) {
+        inst.innerHTML = "🌲 歡迎來到專注森林 🌲";
+    }
+}
 }
 
 // 選擇身份後，動態製造該身份的主題按鈕
