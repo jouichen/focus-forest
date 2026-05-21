@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>森林小偵探 - 專注力遊戲</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="score-board">得分: <span id="score">0</span></div>
+        <div id="instruction">指令：看到 <span class="target-text">綠色圓圈</span> 才點擊！</div>
+        
+        <!-- 遊戲主舞台 -->
+        <div id="stage">
+            <div id="game-object"></div>
+        </div>
+        
+        <button id="start-btn">開始遊戲</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
