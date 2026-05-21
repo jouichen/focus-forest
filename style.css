@@ -8,12 +8,18 @@ body { background-color: #F4F7F5; display: flex; justify-content: center; align-
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px);
     display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10;
-    /* 幼兒子選單面板 */
-#toddler-sub-menu {
+    
+/* 通用子選單面板 */
+#sub-menu-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(255, 248, 240, 0.95); /* 溫暖的暖白色 */
+    background: rgba(255, 255, 255, 0.95);
     display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 11;
 }
+
+/* 一級選單各按鈕亮色客製（可選，增加視覺辨識度） */
+.btn-toddler { background-color: #EC4899; }
+.btn-child   { background-color: #10B981; }
+.btn-senior  { background-color: #F59E0B; }
 
 /* 幫幼兒選單客製化可愛顏色 */
 .theme-forest { background-color: #4A6B5D !important; }
