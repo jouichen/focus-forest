@@ -15,19 +15,21 @@ const instruction = document.getElementById('instruction');
 const timerContainer = document.getElementById('timer-container');
 const timerBar = document.getElementById('timer-bar');
 
-// --- 新增：線上免版權音效與音樂網址 ---
-// 答對音效：清脆叮咚聲
-const correctSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-84.wav');
-// 答錯音效：溫和水滴聲
-const wrongSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav');
-// 背景音樂：大自然森林蟲鳴鳥叫 (設定自動循環播放)
-const bgm = new Audio('https://assets.mixkit.co/active_storage/sfx/1238/1238-84.wav'); 
-bgm.loop = true; 
-bgm.volume = 0.4; // 調整背景音樂音量，不要太大聲
+// --- 更新：換成更穩定的線上音效網址 ---
+// 答對音效：清脆的小鈴鐺/叮咚聲（來自 Wikimedia）
+const correctSound = new Audio('https://upload.wikimedia.org/wikipedia/commons/5/5c/Notification_sound.mp3');
 
-// 稍微降低音效音量，保護小朋友耳朵
-correctSound.volume = 0.6;
-wrongSound.volume = 0.5;
+// 答錯音效：溫和的啵啵/木魚聲（來自 Google 專案開源音效）
+const wrongSound = new Audio('https://actions.google.com/sounds/v1/cartoon/wood_plank_flick.ogg');
+
+// 背景音樂：溫柔的森林環境蟲鳴鳥叫聲（來自 Wikimedia）
+const bgm = new Audio('https://upload.wikimedia.org/wikipedia/commons/2/24/Nature_ambience_with_birds_singing.ogg'); 
+
+bgm.loop = true; 
+bgm.volume = 0.3; // 背景音樂小聲、舒服即可
+
+correctSound.volume = 0.5;
+wrongSound.volume = 0.4;
 // ------------------------------------
 
 const squirrelPool = [
