@@ -15,15 +15,16 @@ const instruction = document.getElementById('instruction');
 const timerContainer = document.getElementById('timer-container');
 const timerBar = document.getElementById('timer-bar');
 
-// --- 更新：換成更穩定的線上音效網址 ---
-// 答對音效：清脆的小鈴鐺/叮咚聲（來自 Wikimedia）
-const correctSound = new Audio('https://upload.wikimedia.org/wikipedia/commons/5/5c/Notification_sound.mp3');
+// --- 更新：直接讀取你 GitHub 專案裡的音效檔案 ---
+// 答對音效（讀取同目錄下的 success.mp3）
+const correctSound = new Audio('success.mp3');
 
-// 答錯音效：溫和的啵啵/木魚聲（來自 Google 專案開源音效）
-const wrongSound = new Audio('https://actions.google.com/sounds/v1/cartoon/wood_plank_flick.ogg');
+// 答錯音效（讀取同目錄下的 pop.mp3）
+const wrongSound = new Audio('pop.mp3');
 
-// 背景音樂：溫柔的森林環境蟲鳴鳥叫聲（來自 Wikimedia）
-const bgm = new Audio('https://upload.wikimedia.org/wikipedia/commons/2/24/Nature_ambience_with_birds_singing.ogg'); 
+// 背景音樂（我們先暫時關閉，確保前兩個音效正常發聲）
+const bgm = new Audio(''); 
+// ------------------------------------
 
 bgm.loop = true; 
 bgm.volume = 0.3; // 背景音樂小聲、舒服即可
