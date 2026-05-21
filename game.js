@@ -100,13 +100,42 @@ function handleClick(e) {
     e.preventDefault();
 
     const isTarget = gameObject.dataset.isTarget === 'true';
+    
+    // --- 新增：獲取點擊位置並創造飄浮文字 ---
+    // 取得點擊時相對於遊戲舞台（stage）的座標
+    const rect = stage.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+
+    // 建立一個新的 div 來放數字
+    const floatDiv = document.createElement('div');
+    floatDiv.classList.add('floating-text');
+    
+    // 根據對錯給予不同的分數與顏色
     if (isTarget) {
         score += 10;
+        floatDiv.innerText = '+10';
     } else {
         score = Math.max(0, score - 5);
+        floatDiv.innerText = '-5';
+        floatDiv.classList.add('minus'); // 變成紅色字
     }
+    
+    // 設定特效字出現的位置（剛好在點擊點的上方一點點）
+    floatDiv.style.left = (clickX - 15) + 'px';
+    floatDiv.style.top = (clickY - 20) + 'px';
+    
+    // 把特效放進遊戲舞台裡
+    stage.appendChild(floatDiv);
+    
+    // 動態結束後（0.8秒），自動把這個 div 刪除，不佔記憶體
+    setTimeout(() => {
+        floatDiv.remove();
+    }, 800);
+    // ----------------------------------------
+
     scoreDisplay.innerText = score;
-    gameObject.style.display = 'none';
+    gameObject.style.display = 'none'; // 目標立刻消失
 }
 
 function endGame() {
