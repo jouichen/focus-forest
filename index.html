@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>專注森林 focus-forest</title>
+    <title>專注森林 - 全齡版本</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,12 +16,17 @@
         </div>
         
         <div id="stage">
+            <div id="menu-overlay">
+                <h3>請選擇遊戲模式</h3>
+                <button class="mode-btn" onclick="initGame('TODDLER')">👶 幼兒模式 (簡單)</button>
+                <button class="mode-btn" onclick="initGame('CHILD')">🐿️ 兒童模式 (挑戰)</button>
+                <button class="mode-btn" onclick="initGame('SENIOR')">👵 長輩模式 (樂齡)</button>
+            </div>
             <div id="game-object"></div>
         </div>
         
-        <button id="start-btn">開始遊戲</button>
+        <button id="restart-btn" style="display:none;" onclick="showMenu()">返回主選單</button>
     </div>
-
     <script src="game.js"></script>
 </body>
 </html>
